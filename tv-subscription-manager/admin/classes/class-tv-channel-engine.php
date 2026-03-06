@@ -380,15 +380,25 @@ class TV_Channel_Engine {
         $saved_active = get_option('tv_sbe_active_countries');
         $active_list  = (is_array($saved_active) && !empty($saved_active)) ? $saved_active : self::get_all_countries();
 
-        $broadcasters = self::get_core_broadcasters();
-        usort($broadcasters, function($a, $b) { return mb_strlen($b) - mb_strlen($a); });
+        // Convert active_list to a hash set for O(1) membership checks throughout parsing.
+        $active_set = array_flip($active_list);
+
+        // Sort broadcasters by descending length so longer/more-specific names match
+        // before shorter ones. Cache the result statically so the sort runs only once
+        // per request regardless of how many times process_text() is called.
+        static $sorted_broadcasters = null;
+        if ($sorted_broadcasters === null) {
+            $sorted_broadcasters = self::get_core_broadcasters();
+            usort($sorted_broadcasters, function($a, $b) { return mb_strlen($b) - mb_strlen($a); });
+        }
+        $broadcasters = $sorted_broadcasters;
 
         $lines             = preg_split('/\r\n|\r|\n/', $raw_text);
         $extracted_data    = [];
         $unprocessed_lines = [];
 
         foreach ($lines as $line) {
-            $parsed = $this->parse_pipe_line($line, $broadcasters, $active_list, $junk_phrases, $transform_rules);
+            $parsed = $this->parse_pipe_line($line, $broadcasters, $active_set, $junk_phrases, $transform_rules);
             if ($parsed !== false) {
                 $extracted_data[] = $parsed;
             } else {
@@ -401,19 +411,21 @@ class TV_Channel_Engine {
             $blob = implode("\n", $unprocessed_lines);
             // Check if it has structural delimiters
             if (strpos($blob, ':') !== false || strpos($blob, '|') !== false) {
-                $more = $this->parse_line_layout($blob, $broadcasters, $active_list, $junk_phrases, $transform_rules);
+                $more = $this->parse_line_layout($blob, $broadcasters, $active_set, $junk_phrases, $transform_rules);
                 $extracted_data = array_merge($extracted_data, $more);
             }
         }
 
-        return $this->consolidate_results($extracted_data, $active_list);
+        return $this->consolidate_results($extracted_data, $active_set);
     }
 
     /**
      * Primary parser: handles "Country: Chan1 | Chan2 | Chan3 |" format
      * Achieves 99.9% accuracy on the broadcaster list format provided.
+     *
+     * @param array $active_set Flipped active-country array (keys are country names) for O(1) lookup.
      */
-    private function parse_pipe_line($line, $broadcasters, $active_list, $junk, $rules) {
+    private function parse_pipe_line($line, $broadcasters, $active_set, $junk, $rules) {
         $line = trim($line);
         if (empty($line)) return false;
 
@@ -427,18 +439,20 @@ class TV_Channel_Engine {
 
         if (empty($country_raw) || empty($channels_blob)) return false;
 
-        // Match against canonical country list (case-insensitive)
-        $matched_country = null;
-        foreach (self::$canonical_countries as $c) {
-            if (strcasecmp($country_raw, $c) === 0) {
-                $matched_country = $c;
-                break;
+        // Match against canonical country list using a static lowercase-keyed map so the
+        // lookup is O(1) instead of O(n) per line.
+        static $country_lower_map = null;
+        if ($country_lower_map === null) {
+            $country_lower_map = [];
+            foreach (self::$canonical_countries as $c) {
+                $country_lower_map[strtolower($c)] = $c;
             }
         }
+        $matched_country = $country_lower_map[strtolower($country_raw)] ?? null;
         if (!$matched_country) return false;
 
-        // Check if country is in active list
-        if (!in_array($matched_country, $active_list, true)) return false;
+        // Check if country is in active set (O(1) via isset on flipped array)
+        if (!isset($active_set[$matched_country])) return false;
 
         // Split channels on pipe
         $raw_chunks = explode('|', $channels_blob);
@@ -473,8 +487,10 @@ class TV_Channel_Engine {
 
     /**
      * Fallback parser for line-by-line or blob format
+     *
+     * @param array $active_set Flipped active-country array for O(1) lookup.
      */
-    private function parse_line_layout($text, $broadcasters, $active_list, $junk, $rules) {
+    private function parse_line_layout($text, $broadcasters, $active_set, $junk, $rules) {
         $results = [];
         $lines   = preg_split('/\r\n|\r|\n/', $text);
         $curr_c  = null;
@@ -493,7 +509,7 @@ class TV_Channel_Engine {
 
             if ($matched) {
                 $curr_c    = $matched;
-                $is_active = in_array($matched, $active_list, true);
+                $is_active = isset($active_set[$matched]);
                 $soup = trim(preg_replace('/^\s*' . preg_quote($matched, '/') . '\s*[:\-]*/iu', '', $line));
             } else {
                 if ($curr_c) { $soup = $line; } else { continue; }
@@ -534,16 +550,26 @@ class TV_Channel_Engine {
         return $results;
     }
 
-    private function consolidate_results($extracted_data, $active_list) {
+    /**
+     * @param array $active_set Flipped active-country array for O(1) lookup.
+     */
+    private function consolidate_results($extracted_data, $active_set) {
         $consolidated = [];
+        // Use a nested hash map for O(1) per-country channel deduplication
+        // instead of in_array() which is O(n) per insertion.
+        $channel_seen = [];
         foreach ($extracted_data as $item) {
             $country = $item['country'];
-            if (!in_array($country, $active_list, true)) continue;
-            if (!isset($consolidated[$country])) $consolidated[$country] = [];
+            if (!isset($active_set[$country])) continue;
+            if (!isset($consolidated[$country])) {
+                $consolidated[$country] = [];
+                $channel_seen[$country] = [];
+            }
             foreach ((is_array($item['channels']) ? $item['channels'] : [$item['channels']]) as $ch) {
                 $ch = trim($ch);
-                if ($ch && !in_array($ch, $consolidated[$country])) {
-                    $consolidated[$country][] = $ch;
+                if ($ch && !isset($channel_seen[$country][$ch])) {
+                    $consolidated[$country][]    = $ch;
+                    $channel_seen[$country][$ch] = true;
                 }
             }
         }

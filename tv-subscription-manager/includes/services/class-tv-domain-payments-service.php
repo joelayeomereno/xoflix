@@ -39,7 +39,19 @@ class TV_Domain_Payments_Service {
     public function approve_payment(int $payment_id, array $creds = [], bool $notify = true) : array {
         TV_Domain_Contract::assert_positive_int($payment_id, 'payment_id');
 
-        // 1) Mark payment approved AND assign a unique permanent XPAY- transaction ID.
+        // 1) Fetch the payment first so we can validate it before writing.
+        //    Updating before reading means we may silently update a non-existent row.
+        $pay = $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_payments} WHERE id = %d", $payment_id));
+        if (!$pay) {
+            return array('ok' => false, 'error' => 'Payment not found');
+        }
+
+        $sub_id = (int)$pay->subscription_id;
+        if ($sub_id <= 0) {
+            return array('ok' => false, 'error' => 'Payment missing subscription_id');
+        }
+
+        // 2) Mark payment approved AND assign a unique permanent XPAY- transaction ID.
         //    Format: XPAY-{YYYYMMDD}-{PAYID}-{6 random hex chars}
         //    This prefix is exclusive to admin-approved transactions and
         //    visually/programmatically distinguishes them from TMP- (pending)
@@ -54,17 +66,8 @@ class TV_Domain_Payments_Service {
             array('id' => $payment_id)
         );
 
-        $pay = $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_payments} WHERE id = %d", $payment_id));
-        if (!$pay) {
-            return array('ok' => false, 'error' => 'Payment not found');
-        }
-
-        $sub_id = (int)$pay->subscription_id;
-        if ($sub_id <= 0) {
-            return array('ok' => false, 'error' => 'Payment missing subscription_id');
-        }
-
-        // 2) Optional acknowledgement email
+        // 3) Optional acknowledgement email — reuse the injected subs_service's shared
+        //    notifications instance instead of creating a new one each time.
         if ($notify && !empty($pay->user_id)) {
             $msg = 'Your payment has been approved. Your subscription will be fulfilled shortly.';
             if (class_exists('TV_Domain_Notifications_Service')) {
@@ -72,7 +75,7 @@ class TV_Domain_Payments_Service {
             }
         }
 
-        // 3) Audit log
+        // 4) Audit log
         $this->audit->log_event((int)get_current_user_id(), 'Payment Approved', 'Transaction ID: ' . (int)$payment_id . ' approved. Permanent ID: ' . $new_txn_id);
 
         return array('ok' => true, 'payment_id' => (int)$payment_id);
@@ -99,8 +102,8 @@ class TV_Domain_Payments_Service {
         if (!empty($result['ok'])) {
             $this->wpdb->update($this->table_payments, array('status' => 'COMPLETED'), array('id' => $payment_id));
 
-            $sub = $this->wpdb->get_row($this->wpdb->prepare("SELECT user_id FROM {$this->table_subs} WHERE id = %d", $sub_id));
-            $uid = $sub ? (int)$sub->user_id : 0;
+            // activate_subscription() already returns user_id — no extra DB query needed.
+            $uid = isset($result['user_id']) ? (int)$result['user_id'] : (int)$pay->user_id;
             $this->audit->log_event((int)get_current_user_id(), 'Payment Fulfilled', 'Transaction ID: ' . (int)$payment_id . ' fulfilled. Credentials provisioned for User ID: ' . $uid);
         } else {
             $this->audit->log_event((int)get_current_user_id(), 'Fulfillment Failed', 'Transaction ID: ' . (int)$payment_id . ' failed. Error: ' . ($result['error'] ?? 'Unknown'));

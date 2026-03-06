@@ -34,8 +34,14 @@ class TV_Domain_Audit_Service {
         }
 
         // Be conservative: don't attempt insert if table doesn't exist.
-        $exists = $this->wpdb->get_var($this->wpdb->prepare("SHOW TABLES LIKE %s", $this->table_logs));
-        if ($exists !== $this->table_logs) {
+        // Cache the result statically so the SHOW TABLES query is only executed
+        // once per request instead of on every log_event() call.
+        static $table_exists_cache = [];
+        if (!isset($table_exists_cache[$this->table_logs])) {
+            $exists = $this->wpdb->get_var($this->wpdb->prepare("SHOW TABLES LIKE %s", $this->table_logs));
+            $table_exists_cache[$this->table_logs] = ($exists === $this->table_logs);
+        }
+        if (!$table_exists_cache[$this->table_logs]) {
             return;
         }
 

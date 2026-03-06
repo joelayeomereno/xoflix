@@ -75,8 +75,8 @@ class TV_Channel_Engine {
         'Croatia'                        => 'HRV',
         'Cyprus'                         => 'CYP',
         'Czech Republic'                 => 'CZE',
-        "Côte D'Ivoire"                  => 'CIV',
-        "Côte d'Ivoire"                  => 'CIV',
+        "Cï¿½te D'Ivoire"                  => 'CIV',
+        "Cï¿½te d'Ivoire"                  => 'CIV',
         'Cote D\'Ivoire'                 => 'CIV',
         'Denmark'                        => 'DNK',
         'Djibouti'                       => 'DJI',
@@ -201,8 +201,8 @@ class TV_Channel_Engine {
         'Sweden'                         => 'SWE',
         'Switzerland'                    => 'CHE',
         'Syria'                          => 'SYR',
-        'São Tomé and Príncipe'          => 'STP',
-        'Sao Tomé and Príncipe'          => 'STP',
+        'Sï¿½o Tomï¿½ and Prï¿½ncipe'          => 'STP',
+        'Sao Tomï¿½ and Prï¿½ncipe'          => 'STP',
         'Tanzania'                       => 'TZA',
         'Thailand'                       => 'THA',
         'Togo'                           => 'TGO',
@@ -235,7 +235,7 @@ class TV_Channel_Engine {
         "Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde Islands",
         "Cayman Islands","Central African Republic","Chad","Chile","China","Colombia",
         "Comoros","Congo DR","Costa Rica","Croatia","Cyprus","Czech Republic",
-        "Côte D'Ivoire","Cote D'Ivoire","Denmark","Djibouti","Dominica",
+        "Cï¿½te D'Ivoire","Cote D'Ivoire","Denmark","Djibouti","Dominica",
         "Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea",
         "Eritrea","Estonia","Ethiopia","Faroe Islands","Fiji","Finland","France",
         "Gabon","Gambia","Georgia","Germany","Ghana","Great Britain","Greece",
@@ -254,7 +254,7 @@ class TV_Channel_Engine {
         "Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Somalia",
         "South Africa","South Sudan","Spain","Sri Lanka","St. Vincent / Grenadines",
         "Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria",
-        "São Tomé and Príncipe","Sao Tomé and Príncipe","Tanzania","Thailand","Togo",
+        "Sï¿½o Tomï¿½ and Prï¿½ncipe","Sao Tomï¿½ and Prï¿½ncipe","Tanzania","Thailand","Togo",
         "Tonga","Trinidad and Tobago","Tunisia","Turkey","Turks and Caicos Islands",
         "Uganda","Ukraine","United Arab Emirates","Uruguay","USA","Vanuatu","Venezuela",
         "Vietnam","Yemen","Zambia","Zimbabwe",
@@ -274,7 +274,7 @@ class TV_Channel_Engine {
     private function sanitize_input($text) {
         // Normalize non-breaking spaces, zero-width chars, BOM, etc.
         $search = ["\xC2\xA0","\xA0","&nbsp;","\xEF\xBF\xBD","\xE2\x80\x8B","\xE2\x80\x8C","\xE2\x80\x8D","\xEF\xBB\xBF"];
-        $text   = str_replace(["\xE2\x80\x93","\xE2\x80\x94","–","—"], ':', $text); // em-dash ? colon
+        $text   = str_replace(["\xE2\x80\x93","\xE2\x80\x94","ï¿½","ï¿½"], ':', $text); // em-dash ? colon
         $text   = str_replace(['|','\u007c','|','?','|','?'], '|', $text);         // normalize pipes
         return str_replace($search, ' ', (string)$text);
     }
@@ -313,7 +313,7 @@ class TV_Channel_Engine {
             "Arena Sport 2 Croatia","Arena Sport 2P","Arena Sport 2","Arena Sport 1 Croatia",
             "Arena Sport 1 Slovenia","Arena Sport 1P","Arena Sport 1","Arena 3 Premium",
             "Arena 2 Premium","Arena 1 Premium","Arena Sport",
-            "Match4","Match 4","SÝN Sport 2","SÝN Sport","Spíler1",
+            "Match4","Match 4","Sï¿½N Sport 2","Sï¿½N Sport","Spï¿½ler1",
             "Diema Sport 2","Play Diema Xtra","Nova Sports Premier League",
             "Proximus Pickx","Play Sports 3","Play Sports",
             "Go3 Extra Sports Estonia","Go3 Extra Sports Latvia","Go3 Extra Sports Lithuania",
@@ -330,7 +330,7 @@ class TV_Channel_Engine {
             "UNIVERSO NOW","UNIVERSO","TeleXitos","NAICOM","Max Mexico","Max Brazil",
             "TNT Brasil","TNT Go","TNT Sports","Max",
             "USA Network","Telemundo Deportes En Vivo","Telemundo","SiriusXM FC",
-            "Paramount+","Peacock","TUDN USA","TUDN.com","TUDN App","UniMás",
+            "Paramount+","Peacock","TUDN USA","TUDN.com","TUDN App","UniMï¿½s",
             "Univision NOW","CBS Sports Golazo","ViX",
             "Stan Sport","FAST TV","FAST Sports","Fast Sports",
             "Fox Sports Argentina","FOX One","Nexgen",
@@ -380,15 +380,25 @@ class TV_Channel_Engine {
         $saved_active = get_option('tv_sbe_active_countries');
         $active_list  = (is_array($saved_active) && !empty($saved_active)) ? $saved_active : self::get_all_countries();
 
-        $broadcasters = self::get_core_broadcasters();
-        usort($broadcasters, function($a, $b) { return mb_strlen($b) - mb_strlen($a); });
+        // Convert active_list to a hash set for O(1) membership checks throughout parsing.
+        $active_set = array_flip($active_list);
+
+        // Sort broadcasters by descending length so longer/more-specific names match
+        // before shorter ones. Cache the result statically so the sort runs only once
+        // per request regardless of how many times process_text() is called.
+        static $sorted_broadcasters = null;
+        if ($sorted_broadcasters === null) {
+            $sorted_broadcasters = self::get_core_broadcasters();
+            usort($sorted_broadcasters, function($a, $b) { return mb_strlen($b) - mb_strlen($a); });
+        }
+        $broadcasters = $sorted_broadcasters;
 
         $lines             = preg_split('/\r\n|\r|\n/', $raw_text);
         $extracted_data    = [];
         $unprocessed_lines = [];
 
         foreach ($lines as $line) {
-            $parsed = $this->parse_pipe_line($line, $broadcasters, $active_list, $junk_phrases, $transform_rules);
+            $parsed = $this->parse_pipe_line($line, $broadcasters, $active_set, $junk_phrases, $transform_rules);
             if ($parsed !== false) {
                 $extracted_data[] = $parsed;
             } else {
@@ -401,19 +411,21 @@ class TV_Channel_Engine {
             $blob = implode("\n", $unprocessed_lines);
             // Check if it has structural delimiters
             if (strpos($blob, ':') !== false || strpos($blob, '|') !== false) {
-                $more = $this->parse_line_layout($blob, $broadcasters, $active_list, $junk_phrases, $transform_rules);
+                $more = $this->parse_line_layout($blob, $broadcasters, $active_set, $junk_phrases, $transform_rules);
                 $extracted_data = array_merge($extracted_data, $more);
             }
         }
 
-        return $this->consolidate_results($extracted_data, $active_list);
+        return $this->consolidate_results($extracted_data, $active_set);
     }
 
     /**
      * Primary parser: handles "Country: Chan1 | Chan2 | Chan3 |" format
      * Achieves 99.9% accuracy on the broadcaster list format provided.
+     *
+     * @param array $active_set Flipped active-country array (keys are country names) for O(1) lookup.
      */
-    private function parse_pipe_line($line, $broadcasters, $active_list, $junk, $rules) {
+    private function parse_pipe_line($line, $broadcasters, $active_set, $junk, $rules) {
         $line = trim($line);
         if (empty($line)) return false;
 
@@ -427,18 +439,20 @@ class TV_Channel_Engine {
 
         if (empty($country_raw) || empty($channels_blob)) return false;
 
-        // Match against canonical country list (case-insensitive)
-        $matched_country = null;
-        foreach (self::$canonical_countries as $c) {
-            if (strcasecmp($country_raw, $c) === 0) {
-                $matched_country = $c;
-                break;
+        // Match against canonical country list using a static lowercase-keyed map so the
+        // lookup is O(1) instead of O(n) per line.
+        static $country_lower_map = null;
+        if ($country_lower_map === null) {
+            $country_lower_map = [];
+            foreach (self::$canonical_countries as $c) {
+                $country_lower_map[strtolower($c)] = $c;
             }
         }
+        $matched_country = $country_lower_map[strtolower($country_raw)] ?? null;
         if (!$matched_country) return false;
 
-        // Check if country is in active list
-        if (!in_array($matched_country, $active_list, true)) return false;
+        // Check if country is in active set (O(1) via isset on flipped array)
+        if (!isset($active_set[$matched_country])) return false;
 
         // Split channels on pipe
         $raw_chunks = explode('|', $channels_blob);
@@ -473,8 +487,10 @@ class TV_Channel_Engine {
 
     /**
      * Fallback parser for line-by-line or blob format
+     *
+     * @param array $active_set Flipped active-country array for O(1) lookup.
      */
-    private function parse_line_layout($text, $broadcasters, $active_list, $junk, $rules) {
+    private function parse_line_layout($text, $broadcasters, $active_set, $junk, $rules) {
         $results = [];
         $lines   = preg_split('/\r\n|\r|\n/', $text);
         $curr_c  = null;
@@ -493,7 +509,7 @@ class TV_Channel_Engine {
 
             if ($matched) {
                 $curr_c    = $matched;
-                $is_active = in_array($matched, $active_list, true);
+                $is_active = isset($active_set[$matched]);
                 $soup = trim(preg_replace('/^\s*' . preg_quote($matched, '/') . '\s*[:\-]*/iu', '', $line));
             } else {
                 if ($curr_c) { $soup = $line; } else { continue; }
@@ -534,16 +550,26 @@ class TV_Channel_Engine {
         return $results;
     }
 
-    private function consolidate_results($extracted_data, $active_list) {
+    /**
+     * @param array $active_set Flipped active-country array for O(1) lookup.
+     */
+    private function consolidate_results($extracted_data, $active_set) {
         $consolidated = [];
+        // Use a nested hash map for O(1) per-country channel deduplication
+        // instead of in_array() which is O(n) per insertion.
+        $channel_seen = [];
         foreach ($extracted_data as $item) {
             $country = $item['country'];
-            if (!in_array($country, $active_list, true)) continue;
-            if (!isset($consolidated[$country])) $consolidated[$country] = [];
+            if (!isset($active_set[$country])) continue;
+            if (!isset($consolidated[$country])) {
+                $consolidated[$country] = [];
+                $channel_seen[$country] = [];
+            }
             foreach ((is_array($item['channels']) ? $item['channels'] : [$item['channels']]) as $ch) {
                 $ch = trim($ch);
-                if ($ch && !in_array($ch, $consolidated[$country])) {
-                    $consolidated[$country][] = $ch;
+                if ($ch && !isset($channel_seen[$country][$ch])) {
+                    $consolidated[$country][]    = $ch;
+                    $channel_seen[$country][$ch] = true;
                 }
             }
         }

@@ -51,7 +51,7 @@ class TV_Admin_Settings extends TV_Admin_Base {
             if (!in_array('manual', $clean)) $clean[] = 'manual';
             update_option('tv_enabled_extractors', $clean);
             $this->show_notice('Extractor settings saved.');
-            wp_redirect(admin_url('admin.php?page=tv-sports'));
+            wp_redirect(add_query_arg(['page' => 'tv-sports'], $this->admin_base_url()));
             exit;
         }
 

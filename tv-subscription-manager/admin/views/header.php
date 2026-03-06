@@ -10,46 +10,50 @@
         </div>
 
         <!-- Navigation -->
+        <?php
+        // Context-aware base URL: use /manager when running standalone, WP admin otherwise.
+        $_tv_nav_base = defined('STREAMOS_MANAGER_CONTEXT') ? home_url('/manager') : admin_url('admin.php');
+        ?>
         <nav class="tv-nav">
-            <a href="<?php echo admin_url('admin.php?page=tv-dashboard'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-dashboard'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'dashboard') ? 'active' : ''; ?>">
                 Dashboard
             </a>
-            <a href="<?php echo admin_url('admin.php?page=tv-subscribers'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-subscribers'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo (isset($_GET['page']) && $_GET['page'] === 'tv-subscribers') ? 'active' : ''; ?>">
                 Subscribers
             </a>
-            <a href="<?php echo admin_url('admin.php?page=tv-subs-manager&tab=plans'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'plans') ? 'active' : ''; ?>">
                 Plans
             </a>
-            <a href="<?php echo admin_url('admin.php?page=tv-subs-manager&tab=payments'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'payments'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'payments') ? 'active' : ''; ?>">
                 Transactions
             </a>
-            <a href="<?php echo admin_url('admin.php?page=tv-sports'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-sports'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'sports') ? 'active' : ''; ?>">
                 Sports
             </a>
             <?php if (current_user_can('manage_options') || current_user_can('manage_tv_finance')): ?>
-            <a href="<?php echo admin_url('admin.php?page=tv-subs-manager&tab=finance'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'finance'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'finance') ? 'active' : ''; ?>">
                 Finance
             </a>
             <?php endif; ?>
-            <a href="<?php echo admin_url('admin.php?page=tv-subs-manager&tab=coupons'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'coupons'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'coupons') ? 'active' : ''; ?>">
                 Coupons
             </a>
-            <a href="<?php echo admin_url('admin.php?page=tv-subs-manager&tab=methods'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'methods'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'methods') ? 'active' : ''; ?>">
                 Methods
             </a>
-            <a href="<?php echo admin_url('admin.php?page=tv-subs-manager&tab=messages'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'messages'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'messages') ? 'active' : ''; ?>">
                 Messages
             </a>
-            <a href="<?php echo admin_url('admin.php?page=tv-settings-general'); ?>" 
+            <a href="<?php echo esc_url(add_query_arg(['page' => 'tv-settings-general'], $_tv_nav_base)); ?>" 
                class="tv-nav-item <?php echo ($tab === 'settings') ? 'active' : ''; ?>">
                 Settings
             </a>
@@ -57,6 +61,13 @@
 
         <!-- Tools -->
         <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+            <?php if (defined('STREAMOS_MANAGER_CONTEXT')): ?>
+            <a href="<?php echo esc_url(wp_logout_url(home_url('/manager-login'))); ?>"
+               style="font-size:12px;color:var(--tv-text-muted);text-decoration:none;display:flex;align-items:center;gap:4px;"
+               title="Log Out">
+                <span class="dashicons dashicons-exit" style="font-size:16px;width:16px;height:16px;"></span>
+            </a>
+            <?php endif; ?>
             <button id="tv-theme-toggle" class="tv-theme-toggle" title="Toggle Dark/Light Mode" onclick="tvToggleTheme()">
                 <span class="dashicons dashicons-lightbulb" id="tv-theme-icon"></span>
             </button>

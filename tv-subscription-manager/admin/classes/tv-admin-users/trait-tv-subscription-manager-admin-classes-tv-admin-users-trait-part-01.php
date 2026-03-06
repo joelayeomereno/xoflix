@@ -255,7 +255,7 @@ trait TV_Subscription_Manager_Admin_Classes_TV_Admin_Users_Trait_Part_01 {
                 $deleted = wp_delete_user($target_id);
                 
                 if ($deleted) {
-                    $redirect = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'users', 'msg' => 'user_deleted'], admin_url('admin.php'));
+                    $redirect = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'users', 'msg' => 'user_deleted'], $this->admin_base_url());
                     wp_redirect($redirect);
                     exit;
                 } else {

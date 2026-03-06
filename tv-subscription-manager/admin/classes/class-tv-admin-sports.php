@@ -77,7 +77,7 @@ class TV_Admin_Sports extends TV_Admin_Base {
 
             update_option('tv_enabled_extractors', $clean);
             $this->show_notice('Extractor settings saved successfully.');
-            wp_redirect(admin_url('admin.php?page=tv-sports'));
+            wp_redirect(add_query_arg(['page' => 'tv-sports'], $this->admin_base_url()));
             exit;
         }
 
@@ -123,7 +123,7 @@ class TV_Admin_Sports extends TV_Admin_Base {
                 $this->wpdb->update($this->table_sports, $data, ['id' => $id]);
                 $this->log_event('Update Event', 'Updated event ID: ' . $id);
                 delete_transient('streamos_sports_v2');
-                wp_redirect(add_query_arg(['page' => 'tv-sports', 'msg' => 'updated'], admin_url('admin.php')));
+                wp_redirect(add_query_arg(['page' => 'tv-sports', 'msg' => 'updated'], $this->admin_base_url()));
                 exit;
             } else {
                 $this->wpdb->insert($this->table_sports, $data);

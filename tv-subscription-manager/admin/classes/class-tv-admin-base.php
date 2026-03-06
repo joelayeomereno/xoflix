@@ -213,6 +213,23 @@ class TV_Admin_Base {
         return true;
     }
 
+    /**
+     * Returns the correct base URL for admin page redirects and links.
+     *
+     * When rendering inside the standalone /manager route (STREAMOS_MANAGER_CONTEXT is defined),
+     * returns the frontend manager page URL so redirects stay on that page instead of
+     * sending the user to /wp-admin/admin.php.
+     *
+     * Usage (replaces `admin_url('admin.php')`):
+     *   wp_redirect( add_query_arg( $args, $this->admin_base_url() ) );
+     */
+    protected function admin_base_url() : string {
+        if ( defined( 'STREAMOS_MANAGER_CONTEXT' ) ) {
+            return home_url( '/manager' );
+        }
+        return admin_url( 'admin.php' );
+    }
+
     protected function log_event( $action, $details = '' ) {
         $this->wpdb->insert( $this->table_logs, array(
             'user_id'    => get_current_user_id(),

@@ -58,7 +58,7 @@ class TV_Admin_Methods extends TV_Admin_Base {
                 $msg = 'created';
             }
 
-            $redirect_url = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'methods', 'msg' => $msg], admin_url('admin.php'));
+            $redirect_url = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'methods', 'msg' => $msg], $this->admin_base_url());
             wp_redirect($redirect_url);
             exit;
         }
@@ -81,11 +81,11 @@ class TV_Admin_Methods extends TV_Admin_Base {
             // Check result
             if ($this->recycle_bin_soft_delete('payment_method', $this->table_methods, (int)$id, 'id')) {
                 $this->log_event('Delete Payment Method', "Soft-deleted method ID: " . $id);
-                $redirect_url = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'methods', 'msg' => 'deleted'], admin_url('admin.php'));
+                $redirect_url = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'methods', 'msg' => 'deleted'], $this->admin_base_url());
                 wp_redirect($redirect_url);
                 exit;
             } else {
-                $redirect_url = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'methods', 'msg' => 'error'], admin_url('admin.php'));
+                $redirect_url = add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'methods', 'msg' => 'error'], $this->admin_base_url());
                 wp_redirect($redirect_url);
                 exit;
             }

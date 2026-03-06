@@ -19,6 +19,9 @@ $_settings_tabs = [
     'recycle-bin'    => ['label' => 'Recycle Bin',    'icon' => 'dashicons-trash',           'page' => 'tv-settings-recycle'],
     'email-test'     => ['label' => 'Email Tests',    'icon' => 'dashicons-email-alt',       'page' => 'tv-settings-general'],
 ];
+
+// Context-aware base URL: use /manager when running standalone, WP admin otherwise.
+$_stab_base = defined('STREAMOS_MANAGER_CONTEXT') ? home_url('/manager') : admin_url('admin.php');
 ?>
 
 <div class="tv-page-header">
@@ -31,9 +34,11 @@ $_settings_tabs = [
 <div style="display:flex; gap:4px; flex-wrap:wrap; background:var(--tv-surface-active); border:1px solid var(--tv-border); border-radius:14px; padding:5px; margin-bottom:24px;">
     <?php foreach ($_settings_tabs as $_stab_key => $_stab_info):
         $_is_active = ($_current_settings_tab === $_stab_key);
-        $_href = ($_stab_key === 'email-test')
-            ? esc_url(admin_url('admin.php?page=tv-settings-general&tab=email-test'))
-            : esc_url(admin_url('admin.php?page=' . $_stab_info['page']));
+        if ($_stab_key === 'email-test') {
+            $_href = esc_url(add_query_arg(['page' => 'tv-settings-general', 'tab' => 'email-test'], $_stab_base));
+        } else {
+            $_href = esc_url(add_query_arg(['page' => $_stab_info['page']], $_stab_base));
+        }
     ?>
     <a href="<?php echo $_href; ?>"
        style="display:inline-flex; align-items:center; gap:7px; padding:8px 14px; border-radius:10px;

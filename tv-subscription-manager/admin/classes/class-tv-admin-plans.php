@@ -10,7 +10,7 @@ class TV_Admin_Plans extends TV_Admin_Base {
             $num = isset($_POST['tv_support_whatsapp']) ? sanitize_text_field(wp_unslash($_POST['tv_support_whatsapp'])) : '';
             update_option('tv_support_whatsapp', $num);
             $this->log_event('Update WhatsApp Number', 'Updated global WhatsApp trial number.');
-            wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'whatsapp_saved', '_t' => time()], admin_url('admin.php')));
+            wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'whatsapp_saved', '_t' => time()], $this->admin_base_url()));
             exit;
         }
 
@@ -72,12 +72,12 @@ class TV_Admin_Plans extends TV_Admin_Base {
                 
                 if ($result === false) {
                     $db_error = base64_encode($this->wpdb->last_error);
-                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'action' => 'edit', 'id' => $plan_id, 'msg' => 'error', 'err' => $db_error], admin_url('admin.php')));
+                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'action' => 'edit', 'id' => $plan_id, 'msg' => 'error', 'err' => $db_error], $this->admin_base_url()));
                     exit;
                 } else {
                     $this->log_event('Update Plan', "Updated plan ID: " . $plan_id);
                     $this->clear_system_caches();
-                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'action' => 'edit', 'id' => $plan_id, 'msg' => 'updated', '_t' => time()], admin_url('admin.php')));
+                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'action' => 'edit', 'id' => $plan_id, 'msg' => 'updated', '_t' => time()], $this->admin_base_url()));
                     exit;
                 }
 
@@ -90,12 +90,12 @@ class TV_Admin_Plans extends TV_Admin_Base {
                 
                 if ($result === false) {
                     $db_error = base64_encode($this->wpdb->last_error);
-                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'error', 'err' => $db_error], admin_url('admin.php')));
+                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'error', 'err' => $db_error], $this->admin_base_url()));
                     exit;
                 } else {
                     $this->log_event('Create Plan', "Created: " . $data['name']);
                     $this->clear_system_caches();
-                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'created', '_t' => time()], admin_url('admin.php')));
+                    wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'created', '_t' => time()], $this->admin_base_url()));
                     exit;
                 }
             }
@@ -113,10 +113,10 @@ class TV_Admin_Plans extends TV_Admin_Base {
             if ($this->recycle_bin_soft_delete('plan', $this->table_plans, (int)$id, 'id')) {
                 $this->log_event('Delete Plan', "Soft-deleted plan ID: " . $id);
                 $this->clear_system_caches();
-                wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'deleted', '_t' => time()], admin_url('admin.php')));
+                wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'deleted', '_t' => time()], $this->admin_base_url()));
                 exit;
             } else {
-                wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'error', 'err' => base64_encode('Delete failed.')], admin_url('admin.php')));
+                wp_redirect(add_query_arg(['page' => 'tv-subs-manager', 'tab' => 'plans', 'msg' => 'error', 'err' => base64_encode('Delete failed.')], $this->admin_base_url()));
                 exit;
             }
         }

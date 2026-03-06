@@ -1,0 +1,301 @@
+/* ============================================================
+   TV MANAGER Admin UI   Vibrant Modern Edition v9.1
+   Full dark/light theme via body.tv-dark
+   ============================================================ */
+
+:root { --tv-field-h: 44px; }
+
+/* Dark Mode */
+body.tv-dark {
+  --tv-bg: #080e1a;
+  --tv-card: #0d1526;
+  --tv-text: #e2e8f0;
+  --tv-text-muted: #7c91af;
+  --tv-border: rgba(99,130,191,0.18);
+  --tv-surface: #0d1526;
+  --tv-surface-active: rgba(99,130,191,0.1);
+  --tv-glass: rgba(13,21,38,0.92);
+  --tv-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4);
+}
+
+/* Theme Toggle */
+.tv-theme-toggle {
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px; border: 1px solid var(--tv-border);
+  background: var(--tv-surface); color: var(--tv-text); cursor: pointer;
+  transition: all 0.2s;
+}
+.tv-theme-toggle:hover { background: var(--tv-surface-active); transform: scale(1.05); }
+
+/* Form inputs */
+.tv-app-container input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.tv-app-container select,
+.tv-app-container textarea {
+  -webkit-appearance: none; appearance: none;
+  font: inherit; color: var(--tv-text);
+  background: var(--tv-surface);
+  border: 1px solid var(--tv-border);
+  border-radius: 10px; box-shadow: none; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  line-height: 1.4;
+}
+.tv-app-container .tv-control {
+  width: 100%; padding: 12px 14px; min-height: var(--tv-field-h);
+}
+.tv-app-container textarea.tv-control { min-height: 110px; resize: vertical; }
+.tv-app-container select.tv-control {
+  padding-right: 38px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--tv-text-muted) 50%), linear-gradient(135deg, var(--tv-text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px; background-repeat: no-repeat;
+}
+.tv-app-container .tv-control:hover { border-color: rgba(var(--tv-primary-rgb),.4); }
+.tv-app-container .tv-control:focus { border-color: var(--tv-primary); box-shadow: 0 0 0 3px rgba(var(--tv-primary-rgb),.15); }
+
+/* Floating label */
+.tv-app-container .tv-field { position: relative; margin-bottom: 18px; }
+.tv-app-container .tv-field .tv-label {
+  position: absolute; left: 12px; top: 12px; padding: 0 6px;
+  font-size: 13px; color: var(--tv-text-muted);
+  background: var(--tv-surface); border-radius: 8px;
+  transform-origin: left top; transition: 0.15s; pointer-events: none;
+}
+.tv-app-container .tv-field .tv-control { padding-top: 18px; }
+.tv-app-container .tv-field.is-active .tv-label,
+.tv-app-container .tv-field.has-value .tv-label { top: 6px; transform: scale(.86); color: var(--tv-text); }
+.tv-app-container .tv-field.is-active .tv-label { color: var(--tv-primary); }
+.tv-app-container .tv-help { font-size: 12px; color: var(--tv-text-muted); margin-top: 6px; }
+
+/* Toggles */
+.tv-app-container .tv-switch { display: inline-flex; align-items: center; gap: 10px; user-select: none; }
+.tv-app-container .tv-toggle-input { position: absolute; opacity: 0; pointer-events: none; }
+.tv-app-container .tv-toggle-ui {
+  width: 44px; height: 26px; border-radius: 999px;
+  border: 1px solid var(--tv-border); background: var(--tv-surface-active);
+  position: relative; transition: 0.15s; flex: 0 0 auto;
+}
+.tv-app-container .tv-toggle-ui::after {
+  content: ""; width: 20px; height: 20px; border-radius: 999px; background: #fff;
+  position: absolute; top: 2px; left: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15); transition: transform .15s;
+}
+.tv-app-container .tv-toggle-input:checked + .tv-toggle-ui { background: var(--tv-primary); border-color: var(--tv-primary); }
+.tv-app-container .tv-toggle-input:checked + .tv-toggle-ui::after { transform: translateX(18px); }
+
+/* Checkboxes */
+.tv-app-container input[type="checkbox"]:not(.tv-toggle-input) {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 1px solid var(--tv-border); background: var(--tv-surface);
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+.tv-app-container input[type="checkbox"]:not(.tv-toggle-input)::before {
+  content: ""; width: 10px; height: 10px; transform: scale(0);
+  transition: transform .12s; box-shadow: inset 1em 1em var(--tv-primary); border-radius: 2px;
+}
+.tv-app-container input[type="checkbox"]:not(.tv-toggle-input):checked::before { transform: scale(1); }
+
+/* Button loading */
+.tv-app-container .tv-btn.is-loading { opacity: .78; pointer-events: none; }
+.tv-app-container .tv-btn.is-loading::after {
+  content: ""; width: 14px; height: 14px; border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.65); border-top-color: rgba(255,255,255,.1);
+  display: inline-block; margin-left: 10px; animation: tvSpin .85s linear infinite;
+}
+@keyframes tvSpin { to { transform: rotate(360deg); } }
+
+/* Notices */
+.tv-app-container .notice {
+  border: 1px solid var(--tv-border) !important; border-left-width: 4px !important;
+  border-radius: 12px !important; padding: 14px 16px !important;
+  margin: 16px 0 0 !important; background: var(--tv-card) !important;
+  box-shadow: var(--tv-shadow);
+}
+
+/* Modal */
+.tv-modal-overlay {
+  position: fixed; inset: 0; background: rgba(8,14,26,0.7);
+  z-index: 100000; display: flex; align-items: center; justify-content: center;
+  padding: 24px; backdrop-filter: blur(4px);
+}
+.tv-modal {
+  width: 100%; max-width: 520px;
+  background: var(--tv-surface); border: 1px solid var(--tv-border);
+  border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,0.4); overflow: hidden;
+  animation: tvModalIn 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes tvModalIn { from { opacity:0; transform: scale(0.95) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+.tv-modal-header { padding: 18px 20px; border-bottom: 1px solid var(--tv-border); display: flex; align-items: center; justify-content: space-between; }
+.tv-modal-body { padding: 20px; max-height: 72vh; overflow-y: auto; }
+.tv-modal-footer { padding: 14px 20px; border-top: 1px solid var(--tv-border); display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Code pill */
+.tv-code-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 900; letter-spacing: 0.35em;
+  padding: 10px 12px; border-radius: 12px;
+  background: var(--tv-surface-active); border: 1px solid var(--tv-border);
+}
+
+/* Badge variants */
+.tv-badge.approved, .tv-badge.completed { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.tv-badge.pending, .tv-badge.awaiting_proof, .tv-badge.in_progress { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.tv-badge.rejected { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.tv-badge.manual { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+
+/* Date filter bar */
+.tv-date-filter-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  padding: 12px 24px; background: var(--tv-surface); border-bottom: 1px solid var(--tv-border);
+}
+.tv-date-filter-btn {
+  padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--tv-border); background: var(--tv-surface);
+  color: var(--tv-text-muted); cursor: pointer; transition: all 0.15s;
+  text-decoration: none;
+}
+.tv-date-filter-btn:hover, .tv-date-filter-btn.tv-active {
+  background: var(--tv-primary); color: #fff; border-color: var(--tv-primary);
+  box-shadow: 0 2px 8px rgba(var(--tv-primary-rgb),0.35);
+}
+.tv-date-input {
+  padding: 6px 10px; border: 1px solid var(--tv-border); border-radius: 8px;
+  font-size: 12px; background: var(--tv-surface); color: var(--tv-text);
+}
+
+/* ============================================================
+   FIX #1: Settings page dropdown overlap (z-index + overflow)
+   WordPress wp_dropdown_pages uses native <select>
+   ============================================================ */
+.tv-app-container .tv-form-group {
+  position: relative;
+  z-index: auto;
+  margin-bottom: 18px;
+}
+.tv-app-container .tv-form-group select,
+.tv-app-container select.tv-input {
+  position: relative;
+  z-index: 2;
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 38px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--tv-text-muted) 50%), linear-gradient(135deg, var(--tv-text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  background-color: var(--tv-surface);
+}
+/* Prevent card/form-group stacking from overlapping dropdowns */
+.tv-app-container .tv-card {
+  overflow: visible;
+}
+.tv-app-container .tv-card-body {
+  overflow: visible;
+}
+
+/* ============================================================
+   FIX #2: User popup — full-screen overlay + centred inner card
+   The overlay (#tv-user-popup) must cover the TRUE viewport,
+   not just the WP admin content column. We use 100vw/100vh with
+   left:0/top:0 explicitly so the WP sidebar margin never offsets it.
+   The inner card (#tv-user-popup-inner) carries the size constraint.
+   ============================================================ */
+.tv-user-popup-overlay {
+  position: fixed; inset: 0; z-index: 100001;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(8,14,26,0.6); backdrop-filter: blur(3px);
+  padding: 40px;
+}
+.tv-user-popup {
+  width: 100%; max-width: 480px; max-height: 80vh;
+  background: var(--tv-surface); border: 1px solid var(--tv-border);
+  border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  overflow-y: auto; animation: tvModalIn 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ============================================================
+   FIX #3: Broken SVG icon fallback   dashicons safety net
+   When dashicons fail to render, show a neutral placeholder
+   ============================================================ */
+.tv-app-container .dashicons {
+  font-family: dashicons;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* SVG fallback: if an <img> or inline SVG breaks, show a placeholder */
+.tv-app-container img[src=""],
+.tv-app-container img:not([src]),
+.tv-app-container svg:empty {
+  display: inline-block;
+  width: 16px; height: 16px;
+  background: var(--tv-surface-active);
+  border-radius: 4px;
+  border: 1px solid var(--tv-border);
+}
+/* Fix broken SVG strokes in action buttons */
+.tv-app-container .tv-btn svg,
+.tv-app-container .tv-action-btn svg {
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   FIX #4: Plans page   cards too wide, force 2 per row max
+   ============================================================ */
+.tv-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 24px;
+  align-items: start;
+  margin-top: 20px;
+  min-height: 100px;
+}
+@media (max-width: 768px) {
+  .tv-plans-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Mobile */
+/* FIX #1 - Settings dropdowns: prevent native <select> from clipping */
+.tv-app-container .tv-card { overflow: visible; }
+.tv-app-container .tv-card-body { overflow: visible; }
+
+/* FIX #2 - User popup: overlay covers full viewport, inner card is constrained */
+#tv-user-popup {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  margin: 0 !important;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgba(8,14,26,0.65);
+  backdrop-filter: blur(4px);
+  z-index: 999999 !important;
+}
+#tv-user-popup.is-open { display: flex !important; }
+#tv-user-popup-inner {
+  width: 100%; max-width: 480px; max-height: calc(100vh - 48px);
+  background: var(--tv-surface); border: 1px solid var(--tv-border);
+  border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+  overflow-y: auto; animation: tvModalIn 0.25s cubic-bezier(0.16,1,0.3,1);
+  padding: 22px; box-sizing: border-box;
+}
+
+/* FIX #3 - Plans grid: force 2 columns */
+.tv-plans-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+@media(max-width:640px) {
+  .tv-app-container .tv-content-area { padding: 0 16px !important; }
+  .tv-app-container .tv-top-bar { padding: 0 16px !important; }
+}

@@ -1,0 +1,215 @@
+/* v13 PURE WHITE ENGINE
+   Goal: Clean, Headerless, High-Contrast.
+*/
+
+:root {
+    /* v13 Light Mode Token System */
+    --v12-bg: #ffffff !important;
+    --v12-card: #ffffff !important;
+    --v12-card-hover: #f9fafb !important; /* Very light gray hover */
+    --v12-border: #e5e7eb !important;
+    
+    /* Text - High Contrast */
+    --v12-text-main: #111827 !important; /* Nearly Black */
+    --v12-text-muted: #6b7280 !important; /* Gray 500 */
+    
+    /* Accents */
+    --v12-primary: #4f46e5 !important; /* Indigo 600 */
+    --v12-primary-hover: #4338ca !important;
+    --v12-primary-glow: rgba(79, 70, 229, 0.2) !important;
+    
+    --v12-font: 'Inter', system-ui, -apple-system, sans-serif !important;
+    --v12-ease: cubic-bezier(0.23, 1, 0.32, 1) !important;
+    
+    /* Shadows (crucial for white theme depth) */
+    --v12-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    --v12-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    --v12-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    --v12-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* 1. NUCLEAR RESET & HEADER ANNIHILATION */
+body.iptv-v12-override {
+    background-color: var(--v12-bg) !important;
+    color: var(--v12-text-main) !important;
+    font-family: var(--v12-font) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5 !important;
+    -webkit-font-smoothing: antialiased !important;
+    font-size: 16px !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+/* Kill any remaining header traces */
+body.iptv-v12-override header, 
+body.iptv-v12-override .site-header, 
+body.iptv-v12-override #masthead {
+    display: none !important;
+}
+
+/* Typography */
+body.iptv-v12-override h1, body.iptv-v12-override h2, body.iptv-v12-override h3, 
+body.iptv-v12-override h4 {
+    color: var(--v12-text-main) !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.5em !important;
+    letter-spacing: -0.02em !important;
+}
+
+body.iptv-v12-override p {
+    color: var(--v12-text-muted) !important;
+    margin-bottom: 1.5em !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+}
+
+/* 2. COMPONENT SYSTEM */
+.v12-container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 24px !important;
+    width: 100% !important;
+}
+
+.v12-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 14px 28px !important;
+    border-radius: 99px !important; /* Rounded pills */
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s var(--v12-ease) !important;
+    border: none !important;
+    text-decoration: none !important;
+}
+
+.v12-btn-primary {
+    background: var(--v12-primary) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px var(--v12-primary-glow) !important;
+}
+.v12-btn-primary:hover {
+    background: var(--v12-primary-hover) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px var(--v12-primary-glow) !important;
+}
+
+.v12-btn-outline {
+    background: transparent !important;
+    border: 1px solid var(--v12-border) !important;
+    color: var(--v12-text-main) !important;
+}
+.v12-btn-outline:hover {
+    border-color: var(--v12-text-muted) !important;
+    background: #f3f4f6 !important;
+}
+
+/* White Theme Cards */
+.v12-card {
+    background: var(--v12-card) !important;
+    border: 1px solid var(--v12-border) !important;
+    border-radius: 20px !important;
+    padding: 32px !important;
+    box-shadow: var(--v12-shadow-sm) !important;
+    transition: all 0.3s var(--v12-ease) !important;
+}
+.v12-card:hover {
+    box-shadow: var(--v12-shadow-lg) !important;
+    transform: translateY(-4px) !important;
+    border-color: var(--v12-primary) !important;
+}
+
+/* 3. FLOATING AUTH BUTTONS */
+.v12-floating-auth {
+    position: fixed !important;
+    top: 24px !important;
+    right: 24px !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    gap: 12px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    padding: 8px !important;
+    border-radius: 99px !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    box-shadow: var(--v12-shadow-md) !important;
+    animation: fadeInDown 0.8s var(--v12-ease) !important;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 4. AUTH PAGES */
+.v12-auth-wrapper {
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #ffffff !important;
+    position: relative !important;
+}
+
+.v12-auth-card {
+    width: 100% !important;
+    max-width: 400px !important;
+    background: #ffffff !important;
+    border: 1px solid var(--v12-border) !important;
+    border-radius: 24px !important;
+    padding: 48px !important;
+    box-shadow: var(--v12-shadow-xl) !important;
+    z-index: 10 !important;
+}
+
+.v12-input {
+    width: 100% !important;
+    padding: 14px !important;
+    background: #f9fafb !important;
+    border: 1px solid var(--v12-border) !important;
+    border-radius: 12px !important;
+    color: var(--v12-text-main) !important;
+    font-size: 1rem !important;
+    outline: none !important;
+    transition: 0.2s !important;
+    margin-bottom: 20px !important;
+}
+.v12-input:focus {
+    border-color: var(--v12-primary) !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px var(--v12-primary-glow) !important;
+}
+
+/* 5. HERO & SECTIONS */
+.v12-hero-section {
+    padding-top: 120px !important; /* Start content lower since no header space needed */
+    padding-bottom: 80px !important;
+    text-align: center !important;
+}
+
+/* Mobile Hero Specifics */
+.v12-mobile-hero {
+    min-height: 80vh !important;
+    background: #000 !important; /* Keep hero dark for image contrast or switch to white if preferred */
+    position: relative !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    padding: 30px !important;
+    border-radius: 0 0 30px 30px !important;
+    overflow: hidden !important;
+}
+.v12-mobile-hero img { opacity: 0.7 !important; }
+/* Override text color specifically for the dark mobile hero */
+.v12-mobile-hero h1 { color: #fff !important; }
+.v12-mobile-hero p { color: rgba(255,255,255,0.9) !important; }
+
+/* 6. UTILS */
+.reveal { opacity: 0; transform: translateY(20px); transition: 0.8s var(--v12-ease); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.gradient-text { background: linear-gradient(135deg, #111, #555); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }

@@ -185,6 +185,19 @@ const ModernSubCard = ({ sub, onExtend }) => {
                 </div>
             )}
 
+            {/* Premium Requests Badge */}
+            {sub.premiumRequests > 0 && (
+                <div className="flex items-center gap-3 mb-6 px-5 py-3.5 bg-indigo-50 border border-indigo-100 rounded-2xl">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center shadow-sm shrink-0">
+                        <Zap size={16} className="text-white" fill="currentColor" />
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Premium Requests</div>
+                        <div className="text-indigo-700 font-black text-lg leading-tight">{sub.premiumRequests.toLocaleString()}</div>
+                    </div>
+                </div>
+            )}
+
             {/* Credentials Section */}
             <div className="bg-slate-50/50 rounded-[1.5rem] border border-slate-100 p-2">
                 <div className="flex gap-2 p-1 bg-white rounded-2xl border border-slate-100 shadow-sm mb-6">

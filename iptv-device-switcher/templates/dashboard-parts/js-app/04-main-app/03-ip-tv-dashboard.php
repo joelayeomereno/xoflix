@@ -316,6 +316,12 @@ function IPTVDashboard() {
                                                                 <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">Time Left</div>
                                                                 <div className={`font-black text-xl leading-tight ${sub.daysLeft < 3 ? 'text-rose-500' : 'text-emerald-600'}`}>{sub.daysLeft} Days</div>
                                                             </div>
+                                                            {sub.premiumRequests > 0 && (
+                                                            <div className="p-6 bg-indigo-900/30 rounded-3xl border border-indigo-700/40 col-span-2">
+                                                                <div className="text-indigo-300 text-[10px] font-black uppercase tracking-widest mb-2">Premium Requests</div>
+                                                                <div className="text-indigo-200 font-black text-xl leading-tight">{sub.premiumRequests.toLocaleString()}</div>
+                                                            </div>
+                                                            )}
                                                         </div>
 
                                                         <div className="mb-10">

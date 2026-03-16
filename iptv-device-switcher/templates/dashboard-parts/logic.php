@@ -184,7 +184,7 @@ if (false === $active_subs) {
         // [FIX] Strictly filter out 'pending' status so they don't show on dashboard
         // Only Active or Expired (Completed lifecycles) are shown.
         $subs_raw = $wpdb->get_results($wpdb->prepare("
-            SELECT s.*, p.name as plan_name, p.price 
+            SELECT s.*, p.name as plan_name, p.price, p.premium_requests 
             FROM $table_subs s 
             LEFT JOIN $table_plans p ON s.plan_id = p.id 
             WHERE s.user_id = %d AND s.status IN ('active', 'expired') 
@@ -248,7 +248,8 @@ if (false === $active_subs) {
                     'status' => ucfirst($s->status),
                     'daysLeft' => max(0, $days_left), 
                     'nextBillingDate' => date('M d, Y', strtotime($s->end_date)),
-                    'price' => $price_display, 
+                    'price' => $price_display,
+                    'premiumRequests' => isset($s->premium_requests) ? intval($s->premium_requests) : 0,
                     'credentials' => [
                         'username' => $s->credential_user ?: 'Pending...',
                         'password' => $s->credential_pass ?: '',

@@ -20,7 +20,7 @@ class TV_Manager_Activator {
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-        // UPDATED: Added category and display_order
+        // UPDATED: Added category, display_order, and premium_requests
         $sql_plans = "CREATE TABLE $table_plans (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             name varchar(100) NOT NULL,
@@ -31,6 +31,7 @@ class TV_Manager_Activator {
             description text,
             category varchar(50) DEFAULT 'standard',
             display_order int(11) DEFAULT 0,
+            premium_requests int(11) DEFAULT 0,
             PRIMARY KEY  (id)
         ) $charset_collate;";
 

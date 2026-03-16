@@ -54,9 +54,11 @@ class TV_Admin_Plans extends TV_Admin_Base {
                 // NEW: Subscription Class & Display Order
                 'category' => isset($_POST['plan_category']) ? sanitize_text_field($_POST['plan_category']) : 'standard',
                 'display_order' => isset($_POST['display_order']) ? intval($_POST['display_order']) : 0,
+                // NEW: Premium Requests
+                'premium_requests' => isset($_POST['premium_requests']) ? intval($_POST['premium_requests']) : 0,
             );
 
-            $formats = array('%s', '%f', '%d', '%d', '%s', '%s', '%s', '%d');
+            $formats = array('%s', '%f', '%d', '%d', '%s', '%s', '%s', '%d', '%d');
 
             // D. Execute DB Operation
             if (!empty($_POST['plan_id'])) {
@@ -183,6 +185,12 @@ class TV_Admin_Plans extends TV_Admin_Base {
         $row = $wpdb->get_results("SHOW COLUMNS FROM $table LIKE 'display_order'");
         if(empty($row)) {
             $wpdb->query("ALTER TABLE $table ADD COLUMN display_order INT(11) DEFAULT 0 AFTER price");
+        }
+
+        // Check for premium_requests
+        $row = $wpdb->get_results("SHOW COLUMNS FROM $table LIKE 'premium_requests'");
+        if(empty($row)) {
+            $wpdb->query("ALTER TABLE $table ADD COLUMN premium_requests INT(11) DEFAULT 0");
         }
     }
 

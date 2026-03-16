@@ -91,6 +91,12 @@
                                                                 <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">Time Left</div>
                                                                 <div className={`font-black text-xl leading-tight ${sub.daysLeft < 3 ? 'text-rose-500' : 'text-emerald-600'}`}>{sub.daysLeft} Days</div>
                                                             </div>
+                                                            {sub.premiumRequests > 0 && (
+                                                            <div className="p-6 bg-indigo-50 rounded-3xl border border-indigo-100 col-span-2">
+                                                                <div className="text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-2">Premium Requests</div>
+                                                                <div className="text-indigo-700 font-black text-xl leading-tight">{sub.premiumRequests.toLocaleString()}</div>
+                                                            </div>
+                                                            )}
                                                         </div>
 
                                                         <div className="mb-10">
@@ -150,7 +156,7 @@
                                                                 </div>
                                                                 <div>
                                                                     <p className="font-bold text-sm text-slate-900">{inv.plan}</p>
-                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">{inv.date} · {inv.amount}</p>
+                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">{inv.date} ï¿½ {inv.amount}</p>
                                                                 </div>
                                                             </div>
                                                             

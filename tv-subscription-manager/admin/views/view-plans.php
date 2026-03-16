@@ -18,6 +18,7 @@ $val_multi = $is_edit ? $edit_plan->allow_multi_connections : 1;
 // NEW: Subscription Class & Display Order
 $val_cat = $is_edit && isset($edit_plan->category) ? $edit_plan->category : 'standard';
 $val_order = $is_edit && isset($edit_plan->display_order) ? intval($edit_plan->display_order) : 0;
+$val_premium_requests = $is_edit && isset($edit_plan->premium_requests) ? intval($edit_plan->premium_requests) : 0;
 
 $val_tiers = ($is_edit && !empty($edit_plan->discount_tiers)) ? json_decode($edit_plan->discount_tiers, true) : [];
 ?>
@@ -312,6 +313,12 @@ $val_tiers = ($is_edit && !empty($edit_plan->discount_tiers)) ? json_decode($edi
                             <label class="tv-label">Cycle (Days)</label>
                             <input type="number" name="plan_duration" required class="tv-input" value="<?php echo esc_attr($val_dur); ?>" placeholder="30">
                         </div>
+                    </div>
+
+                    <div class="tv-form-group">
+                        <label class="tv-label">Premium Requests</label>
+                        <input type="number" name="premium_requests" class="tv-input" value="<?php echo esc_attr($val_premium_requests); ?>" placeholder="0" min="0">
+                        <p style="margin:6px 0 0 0; color:var(--tv-text-muted); font-size:12px;">Number of premium requests included with this plan. Leave at 0 for unlimited.</p>
                     </div>
 
                     <div class="tv-form-group" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid var(--tv-border);">

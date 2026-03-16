@@ -19,6 +19,9 @@ trait TV_Subscription_Mobile_Admin_Rest_Plans_Trait {
                 'allow_multi_connections' => !empty($req['multi']) ? 1 : 0,
                 'description' => wp_kses_post((string)$req['description']),
                 'discount_tiers' => $req->has_param('tiers') ? wp_json_encode($req['tiers']) : null,
+                'category' => $req->has_param('category') ? sanitize_text_field((string)$req['category']) : 'standard',
+                'display_order' => $req->has_param('display_order') ? (int)$req['display_order'] : 0,
+                'premium_requests' => $req->has_param('premium_requests') ? (int)$req['premium_requests'] : 0,
             ];
             $wpdb->insert("{$wpdb->prefix}tv_plans", $data);
             self::log_event('Create Plan', "Created plan: " . $data['name']);
@@ -34,6 +37,9 @@ trait TV_Subscription_Mobile_Admin_Rest_Plans_Trait {
                 'allow_multi_connections' => !empty($req['multi']) ? 1 : 0,
                 'description' => wp_kses_post((string)$req['description']),
                 'discount_tiers' => $req->has_param('tiers') ? wp_json_encode($req['tiers']) : null,
+                'category' => $req->has_param('category') ? sanitize_text_field((string)$req['category']) : 'standard',
+                'display_order' => $req->has_param('display_order') ? (int)$req['display_order'] : 0,
+                'premium_requests' => $req->has_param('premium_requests') ? (int)$req['premium_requests'] : 0,
             ];
             $wpdb->update("{$wpdb->prefix}tv_plans", $data, ['id' => (int)$req['id']]);
             self::log_event('Update Plan', "Updated plan ID: " . (int)$req['id']);

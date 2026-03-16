@@ -19,7 +19,7 @@ $uid = $current_user->ID;
 
 // 2. Data Fetching (Surgical extraction from main logic)
 $subs_raw = $wpdb->get_results("
-    SELECT s.*, p.name as plan_name, p.price, p.duration_days 
+    SELECT s.*, p.name as plan_name, p.price, p.duration_days, p.premium_requests 
     FROM {$wpdb->prefix}tv_subscriptions s 
     LEFT JOIN {$wpdb->prefix}tv_plans p ON s.plan_id = p.id 
     WHERE s.user_id = $uid 
@@ -112,6 +112,14 @@ function streamos_status_badge($status) {
                             <p class="text-sm font-bold text-slate-900"><?php echo $end_nice; ?></p>
                         </div>
                         <div class="h-8 w-px bg-slate-100"></div>
+                        <?php $premium_req = isset($s->premium_requests) ? intval($s->premium_requests) : 0; ?>
+                        <?php if ($premium_req > 0): ?>
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Premium Requests</p>
+                            <p class="text-lg font-black text-slate-900"><?php echo esc_html(number_format($premium_req)); ?></p>
+                        </div>
+                        <div class="h-8 w-px bg-slate-100"></div>
+                        <?php endif; ?>
                         <div class="text-right">
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Price</p>
                             <p class="text-lg font-black text-slate-900">$<?php echo esc_html($s->price); ?></p>
